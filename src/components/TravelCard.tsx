@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Travel } from "@/types/travel";
 import { formatPrice } from "@/utils/price";
 import { toast } from "@/hooks/use-toast";
@@ -100,22 +99,6 @@ export const TravelCard = ({
         <CardContent className="p-4 space-y-2">
           <div>
             <h3 className="font-semibold text-xl truncate">{travel.title}</h3>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span className="text-base truncate">{travel.location}</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-base font-medium">{travel.rating}</span>
-              <span className="text-muted-foreground text-base">
-                ({travel.reviewCount} reviews)
-              </span>
-            </div>
-            <Badge variant="secondary" className="text-xs">
-              {travel.category || travel.activity}
-            </Badge>
           </div>
 
           <div className="flex items-center justify-between">
