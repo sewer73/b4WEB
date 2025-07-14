@@ -10,7 +10,7 @@ export interface Product {
 
 const fetchProducts = async (): Promise<Product[]> => {
   // Replace with your actual n8n webhook URL
-  const webhookUrl = "YOUR_N8N_WEBHOOK_URL/getProductos";
+  const webhookUrl = "https://rebeldia-core.ddns.net/webhook/getProductos";
   
   const response = await fetch(webhookUrl, {
     method: "POST",
