@@ -1,4 +1,4 @@
-import { useState, useMemo, lazy, Suspense } from "react";
+import { useState, useMemo, lazy, Suspense, useEffect, useRef } from "react";
 import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
 import { StickySearchBar } from "@/components/StickySearchBar";
@@ -6,6 +6,7 @@ import { FilterButton } from "@/components/FilterButton";
 import { TravelGrid } from "@/components/TravelGrid";
 import { Travel, SortOption } from "@/types/travel";
 import { useFilteredTravels } from "@/hooks/useFilteredTravels";
+import { useInfiniteTravels } from "@/hooks/useInfiniteTravels";
 
 const TravelDetail = lazy(() =>
   import("@/components/TravelDetail").then((module) => ({
@@ -21,184 +22,52 @@ const Index = () => {
     location: [] as string[],
     duration: [] as string[],
     group_size: [] as string[],
+    category: [] as string[],
     sort: null as SortOption | null,
   });
 
-  const [travels, setTravels] = useState<Travel[]>([
-    {
-      id: "1",
-      title: "Adventure in the Alps",
-      location: "Switzerland",
-      price: 1299,
-      originalPrice: 1599,
-      rating: 4.8,
-      reviewCount: 124,
-      duration: "7 days",
-      group_size: "8-12 people",
-      activity: "adventure",
-      likes: 89,
-      isLiked: false,
-      imgUrl: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "2",
-      title: "Cultural Tour of Japan",
-      location: "Tokyo",
-      price: 2199,
-      rating: 4.9,
-      reviewCount: 89,
-      duration: "10 days",
-      group_size: "6-10 people",
-      activity: "cultural",
-      likes: 156,
-      isLiked: true,
-      imgUrl: "https://images.unsplash.com/photo-1493962853295-0fd70327578a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "3",
-      title: "Tropical Paradise Escape",
-      location: "Maldives",
-      price: 3499,
-      rating: 4.7,
-      reviewCount: 67,
-      duration: "5 days",
-      group_size: "2-4 people",
-      activity: "relaxation",
-      likes: 234,
-      isLiked: false,
-      imgUrl: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "4",
-      title: "Northern Lights Safari",
-      location: "Iceland",
-      price: 1899,
-      originalPrice: 2199,
-      rating: 4.6,
-      reviewCount: 156,
-      duration: "6 days",
-      group_size: "4-8 people",
-      activity: "nature",
-      likes: 178,
-      isLiked: true,
-      imgUrl: "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "5",
-      title: "Urban Photography Walk",
-      location: "New York",
-      price: 299,
-      rating: 4.4,
-      reviewCount: 203,
-      duration: "1 day",
-      group_size: "6-12 people",
-      activity: "urban",
-      likes: 92,
-      isLiked: false,
-      imgUrl: "https://images.unsplash.com/photo-1496307653780-42ee777d4833?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "6",
-      title: "Amazon Rainforest Expedition",
-      location: "Brazil",
-      price: 2799,
-      rating: 4.8,
-      reviewCount: 78,
-      duration: "8 days",
-      group_size: "4-6 people",
-      activity: "nature",
-      likes: 145,
-      isLiked: false,
-      imgUrl: "https://images.unsplash.com/photo-1441057206919-63d19fac2369?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "7",
-      title: "Mediterranean Sailing",
-      location: "Greece",
-      price: 1699,
-      rating: 4.5,
-      reviewCount: 134,
-      duration: "7 days",
-      group_size: "6-8 people",
-      activity: "adventure",
-      likes: 167,
-      isLiked: true,
-      imgUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "8",
-      title: "Moroccan Desert Adventure",
-      location: "Morocco",
-      price: 999,
-      originalPrice: 1299,
-      rating: 4.7,
-      reviewCount: 189,
-      duration: "5 days",
-      group_size: "8-15 people",
-      activity: "adventure",
-      likes: 198,
-      isLiked: false,
-      imgUrl: "https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "9",
-      title: "Balinese Cooking Class",
-      location: "Bali",
-      price: 199,
-      rating: 4.9,
-      reviewCount: 267,
-      duration: "4 hours",
-      group_size: "4-10 people",
-      activity: "cultural",
-      likes: 312,
-      isLiked: true,
-      imgUrl: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "10",
-      title: "Spa Retreat in Tuscany",
-      location: "Italy",
-      price: 2299,
-      rating: 4.6,
-      reviewCount: 98,
-      duration: "6 days",
-      group_size: "2-6 people",
-      activity: "relaxation",
-      likes: 145,
-      isLiked: false,
-      imgUrl: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "11",
-      title: "Patagonia Hiking Expedition",
-      location: "Argentina",
-      price: 1999,
-      rating: 4.8,
-      reviewCount: 112,
-      duration: "9 days",
-      group_size: "6-10 people",
-      activity: "adventure",
-      likes: 189,
-      isLiked: false,
-      imgUrl: "https://images.unsplash.com/photo-1469041797191-50ace28483c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      id: "12",
-      title: "Seoul Street Food Tour",
-      location: "South Korea",
-      price: 149,
-      rating: 4.5,
-      reviewCount: 234,
-      duration: "3 hours",
-      group_size: "8-16 people",
-      activity: "cultural",
-      likes: 156,
-      isLiked: true,
-      imgUrl: "https://images.unsplash.com/photo-1518877593221-1f28583780b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-    },
-  ]);
+  const [travels, setTravels] = useState<Travel[]>([]);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteTravels();
+
+  // Flatten all pages of travels
+  const allTravels = useMemo(() => {
+    if (!data) return [];
+    return data.pages.flatMap((page) => page.data);
+  }, [data]);
+
+  // Update local travels state when new data is fetched
+  useEffect(() => {
+    setTravels(allTravels);
+  }, [allTravels]);
 
   const filteredTravels = useFilteredTravels(travels, searchQuery, filters);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const availableOptions = useMemo(() => {
     return {
@@ -206,6 +75,7 @@ const Index = () => {
       locations: [...new Set(travels.map((t) => t.location))],
       durations: [...new Set(travels.map((t) => t.duration))],
       groupSizes: [...new Set(travels.map((t) => t.group_size))],
+      categories: [...new Set(travels.map((t) => t.category).filter(Boolean))],
     };
   }, [travels]);
 
@@ -224,6 +94,14 @@ const Index = () => {
       })
     );
   };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-destructive">Error loading travels. Please try again.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -259,11 +137,34 @@ const Index = () => {
             />
           </div>
           
-          <TravelGrid
-            travels={filteredTravels}
-            onTravelClick={setSelectedTravel}
-            onLikeToggle={handleLikeToggle}
-          />
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-[16/9] bg-muted rounded-2xl mb-4" />
+                  <div className="space-y-2">
+                    <div className="h-4 bg-muted rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <TravelGrid
+                travels={filteredTravels}
+                onTravelClick={setSelectedTravel}
+                onLikeToggle={handleLikeToggle}
+              />
+              
+              {/* Infinite scroll sentinel */}
+              <div ref={sentinelRef} className="h-10 flex items-center justify-center">
+                {isFetchingNextPage && (
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                )}
+              </div>
+            </>
+          )}
         </div>
       </section>
 

@@ -52,11 +52,12 @@ describe('useFilteredTravels', () => {
   it('should return all travels when no filters are applied', () => {
     const { result } = renderHook(() =>
       useFilteredTravels(mockTravels, '', {
-        activity: [],
-        location: [],
-        duration: [],
-        group_size: [],
-        sort: null,
+      activity: [],
+      location: [],
+      duration: [],
+      group_size: [],
+      category: [],
+      sort: null,
       })
     )
 

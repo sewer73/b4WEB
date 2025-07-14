@@ -6,6 +6,7 @@ interface Filters {
   location: string[];
   duration: string[];
   group_size: string[];
+  category: string[];
   sort: SortOption | null;
 }
 
@@ -41,12 +42,18 @@ export const useFilteredTravels = (
         filters.group_size.length === 0 ||
         filters.group_size.includes(travel.group_size);
 
+      // Category filter
+      const matchesCategory =
+        filters.category.length === 0 ||
+        (travel.category && filters.category.includes(travel.category));
+
       return (
         matchesSearch &&
         matchesActivity &&
         matchesLocation &&
         matchesDuration &&
-        matchesGroupSize
+        matchesGroupSize &&
+        matchesCategory
       );
     });
 
