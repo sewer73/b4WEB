@@ -72,6 +72,7 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
+        category: [],
         sort: null,
       })
     )
@@ -87,6 +88,7 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
+        category: [],
         sort: null,
       })
     )
@@ -102,6 +104,7 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
+        category: [],
         sort: null,
       })
     )
@@ -117,6 +120,7 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
+        category: [],
         sort: SortOption.BEST_RATED,
       })
     )
@@ -133,6 +137,7 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
+        category: [],
         sort: SortOption.LOWEST_PRICE,
       })
     )
@@ -149,6 +154,7 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
+        category: [],
         sort: SortOption.HIGHEST_PRICE,
       })
     )
@@ -165,6 +171,7 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
+        category: [],
         sort: null,
       })
     )
