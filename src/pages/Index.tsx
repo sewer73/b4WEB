@@ -1,40 +1,104 @@
-import { useState, useMemo, lazy, Suspense } from "react";
+import { useState, useMemo, lazy, Suspense, useEffect, useRef } from "react";
 import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
 import { StickySearchBar } from "@/components/StickySearchBar";
-import { ProductGrid } from "@/components/ProductGrid";
-import { Product, useProducts } from "@/hooks/useProducts";
+import { FilterButton } from "@/components/FilterButton";
+import { TravelGrid } from "@/components/TravelGrid";
+import { Travel, SortOption } from "@/types/travel";
+import { useFilteredTravels } from "@/hooks/useFilteredTravels";
+import { useInfiniteTravels } from "@/hooks/useInfiniteTravels";
 
-const ProductDetail = lazy(() =>
-  import("@/components/ProductDetail").then((module) => ({
-    default: module.ProductDetail,
+const TravelDetail = lazy(() =>
+  import("@/components/TravelDetail").then((module) => ({
+    default: module.TravelDetail,
   }))
 );
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedTravel, setSelectedTravel] = useState<Travel | null>(null);
+  const [filters, setFilters] = useState({
+    activity: [] as string[],
+    location: [] as string[],
+    duration: [] as string[],
+    group_size: [] as string[],
+    category: [] as string[],
+    sort: null as SortOption | null,
+  });
 
-  const { data: products = [], isLoading, error } = useProducts();
+  const [travels, setTravels] = useState<Travel[]>([]);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // Filter products based on search query
-  const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products;
-    
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteTravels();
+
+  // Flatten all pages of travels
+  const allTravels = useMemo(() => {
+    if (!data) return [];
+    return data.pages.flatMap((page) => page.data);
+  }, [data]);
+
+  // Update local travels state when new data is fetched
+  useEffect(() => {
+    setTravels(allTravels);
+  }, [allTravels]);
+
+  const filteredTravels = useFilteredTravels(travels, searchQuery, filters);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
     );
-  }, [products, searchQuery]);
 
-  const handleLikeToggle = (productId: number) => {
-    // This could be implemented to save to localStorage or send to backend
-    console.log(`Toggled like for product ${productId}`);
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const availableOptions = useMemo(() => {
+    return {
+      activities: [...new Set(travels.map((t) => t.activity))],
+      locations: [...new Set(travels.map((t) => t.location))],
+      durations: [...new Set(travels.map((t) => t.duration))],
+      groupSizes: [...new Set(travels.map((t) => t.group_size))],
+      categories: [...new Set(travels.map((t) => t.category).filter(Boolean))],
+    };
+  }, [travels]);
+
+  const handleLikeToggle = (travelId: string) => {
+    setTravels((prev) =>
+      prev.map((travel) => {
+        if (travel.id === travelId) {
+          const newIsLiked = !travel.isLiked;
+          return {
+            ...travel,
+            isLiked: newIsLiked,
+            likes: newIsLiked ? travel.likes + 1 : travel.likes - 1,
+          };
+        }
+        return travel;
+      })
+    );
   };
 
   if (error) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-destructive">Error loading products. Please try again.</p>
+        <p className="text-destructive">Error loading travels. Please try again.</p>
       </div>
     );
   }
@@ -49,10 +113,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground">
-              Discover Amazing Products
+              Discover Amazing Travels
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Explore our collection of premium products and experiences
+              Find your next adventure from thousands of unique experiences around the world
             </p>
           </div>
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
@@ -64,8 +128,13 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold">
-              {filteredProducts.length} products found
+              {filteredTravels.length} travels found
             </h2>
+            <FilterButton
+              filters={filters}
+              onFiltersChange={setFilters}
+              availableOptions={availableOptions}
+            />
           </div>
           
           {isLoading ? (
@@ -81,22 +150,31 @@ const Index = () => {
               ))}
             </div>
           ) : (
-            <ProductGrid
-              products={filteredProducts}
-              onProductClick={setSelectedProduct}
-              onLikeToggle={handleLikeToggle}
-            />
+            <>
+              <TravelGrid
+                travels={filteredTravels}
+                onTravelClick={setSelectedTravel}
+                onLikeToggle={handleLikeToggle}
+              />
+              
+              {/* Infinite scroll sentinel */}
+              <div ref={sentinelRef} className="h-10 flex items-center justify-center">
+                {isFetchingNextPage && (
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                )}
+              </div>
+            </>
           )}
         </div>
       </section>
 
-      {/* Product Detail Modal */}
-      {selectedProduct && (
+      {/* Travel Detail Modal */}
+      {selectedTravel && (
         <Suspense fallback={<div>Loading...</div>}>
-          <ProductDetail
-            product={selectedProduct}
-            isOpen={!!selectedProduct}
-            onClose={() => setSelectedProduct(null)}
+          <TravelDetail
+            travel={selectedTravel}
+            isOpen={!!selectedTravel}
+            onClose={() => setSelectedTravel(null)}
           />
         </Suspense>
       )}
