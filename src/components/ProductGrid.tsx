@@ -1,28 +1,27 @@
-import { ProductCard } from "./ProductCard";
 import { Product } from "@/hooks/useProducts";
+import { ProductCard } from "./ProductCard";
 
 interface ProductGridProps {
   products: Product[];
-  onProductClick?: (product: Product) => void;
+  onProductClick: (product: Product) => void;
+  onLikeToggle: (productId: number) => void;
 }
 
-export const ProductGrid = ({ products, onProductClick }: ProductGridProps) => {
-  if (products.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground text-lg">No se encontraron productos</p>
-      </div>
-    );
-  }
-
+export const ProductGrid = ({
+  products,
+  onProductClick,
+  onLikeToggle,
+}: ProductGridProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-6 p-2 space-y-0">
       {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          onClick={onProductClick}
-        />
+        <div key={product.id} className="break-inside-avoid mb-6">
+          <ProductCard
+            product={product}
+            onProductClick={onProductClick}
+            onLikeToggle={onLikeToggle}
+          />
+        </div>
       ))}
     </div>
   );
