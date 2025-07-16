@@ -52,12 +52,11 @@ describe('useFilteredTravels', () => {
   it('should return all travels when no filters are applied', () => {
     const { result } = renderHook(() =>
       useFilteredTravels(mockTravels, '', {
-      activity: [],
-      location: [],
-      duration: [],
-      group_size: [],
-      category: [],
-      sort: null,
+        activity: [],
+        location: [],
+        duration: [],
+        group_size: [],
+        sort: null,
       })
     )
 
@@ -72,7 +71,6 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
-        category: [],
         sort: null,
       })
     )
@@ -88,7 +86,6 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
-        category: [],
         sort: null,
       })
     )
@@ -104,7 +101,6 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
-        category: [],
         sort: null,
       })
     )
@@ -120,7 +116,6 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
-        category: [],
         sort: SortOption.BEST_RATED,
       })
     )
@@ -137,7 +132,6 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
-        category: [],
         sort: SortOption.LOWEST_PRICE,
       })
     )
@@ -154,7 +148,6 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
-        category: [],
         sort: SortOption.HIGHEST_PRICE,
       })
     )
@@ -171,7 +164,6 @@ describe('useFilteredTravels', () => {
         location: [],
         duration: [],
         group_size: [],
-        category: [],
         sort: null,
       })
     )

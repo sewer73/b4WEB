@@ -18,7 +18,6 @@ interface FilterButtonProps {
     location: string[];
     duration: string[];
     group_size: string[];
-    category: string[];
     sort: SortOption | null;
   };
   onFiltersChange: (filters: {
@@ -26,7 +25,6 @@ interface FilterButtonProps {
     location: string[];
     duration: string[];
     group_size: string[];
-    category: string[];
     sort: SortOption | null;
   }) => void;
   availableOptions: {
@@ -34,7 +32,6 @@ interface FilterButtonProps {
     locations: string[];
     durations: string[];
     groupSizes: string[];
-    categories: string[];
   };
 }
 
@@ -46,7 +43,7 @@ export const FilterButton = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const handleMultiSelectChange = (
-    type: "activity" | "location" | "duration" | "group_size" | "category",
+    type: "activity" | "location" | "duration" | "group_size",
     value: string,
     checked: boolean,
   ) => {
@@ -74,7 +71,6 @@ export const FilterButton = ({
       location: [],
       duration: [],
       group_size: [],
-      category: [],
       sort: null,
     });
   };
@@ -84,7 +80,6 @@ export const FilterButton = ({
     filters.location.length > 0 ||
     filters.duration.length > 0 ||
     filters.group_size.length > 0 ||
-    filters.category.length > 0 ||
     filters.sort !== null;
 
   return (
@@ -205,30 +200,6 @@ export const FilterButton = ({
                   className="text-sm"
                 >
                   {groupSize}
-                </Label>
-              </div>
-            ))}
-          </div>
-
-          <Separator />
-
-          {/* Category Filter */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Category</Label>
-            {availableOptions.categories.map((category) => (
-              <div key={category} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`category-${category}`}
-                  checked={filters.category.includes(category)}
-                  onCheckedChange={(checked) =>
-                    handleMultiSelectChange("category", category, !!checked)
-                  }
-                />
-                <Label
-                  htmlFor={`category-${category}`}
-                  className="text-sm"
-                >
-                  {category}
                 </Label>
               </div>
             ))}

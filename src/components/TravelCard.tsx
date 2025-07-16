@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { MapPin, Star, Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Travel } from "@/types/travel";
@@ -99,6 +99,20 @@ export const TravelCard = ({
         <CardContent className="p-4 space-y-2">
           <div>
             <h3 className="font-semibold text-xl truncate">{travel.title}</h3>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <MapPin className="h-4 w-4" />
+              <span className="text-base truncate">{travel.location}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span className="text-base font-medium">{travel.rating}</span>
+            </div>
+            <span className="text-muted-foreground text-base">
+              ({travel.reviewCount} reviews)
+            </span>
           </div>
 
           <div className="flex items-center justify-between">
